@@ -1,0 +1,15 @@
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.idea
+.idea/
+.coverage
+coverage.xml
+__pycache__/
+db.app
+migrations/
+*.csv
