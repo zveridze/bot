@@ -1,11 +1,9 @@
 import argparse
 from macd import build_macd_histogram
-from datetime import datetime
 from utils.point import Point
 from utils.utils import file_writer
 from utils.rules import first_rule_open, first_rule_close, second_rule_open, second_rule_close
-from test import data_appl_60, data_appl_30
-from services.finnhub_service import get_client
+from test_data import data_appl_60
 
 
 def enter_market(frame_fragment):
@@ -64,30 +62,20 @@ def data_frame_close_processing(histogram, data_frame, counter):
 
 
 def start_monitoring(*args):
-    # response_60 = get_client('AAPL', resolution=60, start='2018-01-01 00:00:00')
-    # response_30 = get_client('AAPL', resolution=30, start='2018-01-01 00:00:00')
     response_60 = data_appl_60
-    response_30 = data_appl_30
     is_opened = False
     first = None
     second = None
     histogram, _, data_frame = build_macd_histogram(response_60)
-    his = 0
-    for his, df in zip(histogram, data_frame.iterrows()):
-        print(his)
-        print(f'len: {len(histogram)}')
+    for his, df in zip(range(len(histogram)-1), data_frame.iterrows()):
         if first and second and not is_opened:
             is_opened = enter_market(df)
             first = None
             second = None
-            histogram, _, data_frame = build_macd_histogram(response_30, df[1].date)
-            his = 0
         if first and second and is_opened:
             is_opened = exit_market(df)
             first = None
             second = None
-            histogram, _, data_frame = build_macd_histogram(response_60, df[1].date)
-            his = 0
         try:
             if not is_opened and histogram[his] < 0:
                 first, second = data_frame_open_processing(histogram, data_frame, his)
